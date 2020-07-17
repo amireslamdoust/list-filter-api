@@ -4,7 +4,6 @@ const app = express()
 app.get('/', function (req, res) {
 
     const faker = require('faker');
-    const locales = ["de", "en", "fr", "it"];
     const list = [];
     const limit = 24
     const maxPage = 7
@@ -33,10 +32,25 @@ app.get('/', function (req, res) {
     }
 
     const maxReview = 10000
+
     function getRandomArbitrary(min, max) {
         const rand = Math.random() * (max - min) + min;
         return Math.floor(rand)
     }
+
+    const defaultLocales = ["de", "en", "fr", "it"]
+
+    let locales = []
+
+    req.query.locales && Object.values(req.query.locales).forEach(l => {
+       if(defaultLocales.includes(l)) {
+           locales.push(l)
+       }
+    })
+    if(locales.length < 1) {
+        locales = defaultLocales
+    }
+
 
     for (let i = 0; i < limit; i++) {
 
@@ -85,6 +99,7 @@ app.get('/', function (req, res) {
     res.end(JSON.stringify({
         totalItems: limit * maxPage,
         currentPage: page,
+        locales: locales,
         rate: requestRate,
         reviewSort: reviewSort,
         currentStatus: currentStatus,
